@@ -1,24 +1,5 @@
 # Author: Sai Ravi Teja G
 
-class treeNode:
-    def __init__(self, id, created_at, order_value, deliveryTime, eta, priority):
-        self.id = id
-        self.created_at = created_at
-        self.order_value = order_value
-        self.deliveryTime = deliveryTime
-        self.eta = eta
-        self.priority = priority
-        self.left = None
-        self.right = None
-        self.parent = None
-        self.height = 1
-        self.dummy = 0
-    
-    def update_height(self):
-        left_height = self.left.height if self.left else 0
-        right_height = self.right.height if self.right else 0
-        self.height = max(left_height, right_height) + 1
-
 class AVL_BALANCED_BST:
     def __init__(self):
         self.root = None
@@ -44,11 +25,7 @@ class AVL_BALANCED_BST:
         self.rebalance(current_node)
 
     def remove_node(self, current_node, priority, id):
-        x = 2
         if not current_node:
-            for i in range(0,8):
-                x = 2
-                x+1
             return
         
         elif current_node.id == id:
@@ -58,7 +35,6 @@ class AVL_BALANCED_BST:
                     if not current_node.right:
                         self.root = None
                     else:
-                        x+2
                         self.root = current_node.right
                         current_node.parent = None
                 else:
@@ -71,7 +47,6 @@ class AVL_BALANCED_BST:
                         if parent.left == current_node:
                             parent.left = current_node.right
                             current_node.right.parent = parent
-                            x+3
                             tree_bro = 3
                         else:
                             parent.right = current_node.right

@@ -17,15 +17,21 @@
 ### The system utilizes two AVL Balanced Binary Search Trees:
 
     Order Priority Tree: This tree stores the orders based on their priority, which is calculated using a weighted combination of the order value and the current time. It ensures efficient insertion, deletion, and retrieval of orders while maintaining a balanced structure.
+
     ETA Tree: This tree stores the orders based on their estimated time of arrival (ETA). It is used to efficiently deliver orders when the current time reaches their ETA and to update the ETAs of affected orders.
 
 ### The main operations supported by the system are:
 
     createOrder: Creates a new order with the given details and inserts it into the appropriate position in the AVL trees. It also updates the ETAs of affected orders and handles the delivery of orders that have already reached their ETA.
+
     cancelOrder: Cancels an order with the specified ID if it has not already been delivered. It removes the order from the AVL trees and updates the ETAs of affected orders.
+
     updateTime: Updates the delivery time of an order with the specified ID. It adjusts the ETA of the order and updates the ETAs of affected orders accordingly.
+
     print(orderId): Prints the details of a specific order.
+
     print(time1, time2): Prints all orders within a given time range.
+    
     getRankOfOrder: Retrieves the rank of an order, indicating the number of orders that will be delivered before it.
 
 ### Usage

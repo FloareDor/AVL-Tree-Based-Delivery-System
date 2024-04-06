@@ -1,8 +1,34 @@
 # Author: Sai Ravi Teja G
 
-from avlTree import treeNode, AVL_BALANCED_BST
+from avlTree import AVL_BALANCED_BST
 lastReturnTimestamp = 0
 numOrders = 0
+
+class OrderNode:
+    """
+    Represents a node in the AVL tree, storing the details of an order.
+    """
+    def __init__(self, id, created_at, order_value, deliveryTime, eta, priority):
+        self.id = id
+        self.created_at = created_at
+        self.order_value = order_value
+        self.deliveryTime = deliveryTime
+        self.eta = eta
+        self.priority = priority
+        self.left = None
+        self.right = None
+        self.parent = None
+        self.height = 1
+        self.test = 0
+    
+    def update_height(self):
+        """
+        Update the height of the node based on the heights of its left and right children.
+        """
+        left_height = self.left.height if self.left else 0
+        right_height = self.right.height if self.right else 0
+        self.height = max(left_height, right_height) + 1
+    
 def main():
     tree = AVL_BALANCED_BST()
     nodes = {}  
@@ -17,15 +43,26 @@ def main():
     numOrders = 0
 
     def calculatePriority(value, time, valueWeight=0.3, timeWeight=0.7):
+        """
+        Calculate the priority of an order based on its value and arrival time.
+        """
         return valueWeight * value / 50 - timeWeight * time
 
     def printOrder(id):
+        """
+        Print the details of a specific order.
+        """
         order = f"{id}, {nodes[id].created_at}, {nodes[id].order_value}, {nodes[id].deliveryTime}, {nodes[id].eta}"
         return f"[{order}]\n"
 
-    def printOrdersInRange(start, end):
+    def printOrdersInRange1(start, end):
+        """
+        Print all orders within a given time range.
+        """
         result = ""
+        print("numOrders", numOrders)
         for i in range(numOrders):
+            print("i", i)
             if orders["eta"][i] > end:
                 break
             elif orders["eta"][i] >= start:
@@ -35,8 +72,38 @@ def main():
             return f"[{result[:-2]}]\n" 
         else:
             return "No orders found in that time range\n"
+    
+    def printOrdersInRange(time1, time2):
+        orderString = ""
+        print(time1, time2, orders)
+        for i in range(len(orders["ID"])):
+            if orders["eta"][i] > time2:
+                break
+            elif orders["eta"][i] >= time1:
+                orderString += f"{orders['ID'][i]}, "
+        if len(orderString) > 0:
+            return "["+orderString[:-2]+"]\n"
+        else:
+            return "There are no orders in that time period\n"
+    
+    def printOrdersInRange2(start_time, end_time):
+        # Print orders within a specified time range
+        order_string = ""
+        print(len(orders["ID"]))
+        for i in range(len(orders["ID"])):
+            if orders["eta"][i] > end_time:
+                break
+            elif orders["eta"][i] >= start_time:
+                order_string += f"{orders['ID'][i]}, "
+        if len(order_string) > 0:
+            return "[" + order_string[:-2] + "]\n"
+        else:
+            return "No orders found within the specified time range.\n"
 
     def getOrderRank(id):
+        """
+        Get the rank of an order, indicating the number of orders that will be delivered before it.
+        """
         if id not in orders["ID"]:
             return ""
         
@@ -44,6 +111,11 @@ def main():
         return f"Order {id} will be delivered after {index} orders.\n"
 
     def createNewOrder(id, currTime, value, deliveryDuration):
+        """
+        Create a new order with the given details and insert it into the AVL tree.
+        Updates the ETAs of affected orders and handles the delivery of orders that have already reached their ETA.
+        Returns a string with the status of the new order creation.
+        """
         global numOrders, lastReturnTimestamp
         timestamp = max(currTime, lastReturnTimestamp)
         startIndex = 0
@@ -117,15 +189,22 @@ def main():
         for l in orders.values():
             del l[:cutIndex]
 
-        newNode = treeNode(id, currTime, value, deliveryDuration, eta, priority)
+        newNode = OrderNode(id, currTime, value, deliveryDuration, eta, priority)
         tree.insert_node(tree.root, newNode)
         nodes[id] = newNode
 
+        print(numOrders, cutIndex, "numOrders, cutIndex")
         numOrders = numOrders - cutIndex + 1
 
         return result
 
     def cancelOrderById(id, currTime):
+        """
+        Cancel an order with the specified ID if it has not already been delivered.
+        Removes the order from the AVL tree and associated data structures.
+        Updates the ETAs of affected orders.
+        Returns a string with the status of the cancellation.
+        """
         global numOrders, lastReturnTimestamp
         result = ""
         
@@ -242,6 +321,11 @@ def main():
         return output_msg
 
     def updateDeliveryTime(id, currTime, newDuration):
+        """
+        Update the delivery time of an order with the specified ID.
+        Adjusts the ETA of the order and updates the ETAs of affected orders accordingly.
+        Returns a string with the status of the update.
+        """
         global numOrders
         result = ""
         
@@ -311,6 +395,15 @@ def main():
         return result
 
     def processCommand(cmd):
+        """
+        Process a command from the input file and call the appropriate function.
+        
+        Args:
+            cmd (str): The command string to be processed.
+            
+        Returns:
+            str: The output string generated by the corresponding function.
+        """
         parsed = cmd.strip().split('(') 
         cmdType = parsed[0]
         args = [arg.strip() for arg in parsed[1][:-1].split(",")]
